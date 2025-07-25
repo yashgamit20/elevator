@@ -1,0 +1,29 @@
+module tb_elevator;
+
+    reg clk;
+    reg rst;
+    reg rA,rB,rC,rD;
+    wire  [1:0]floor;
+    wire dir;
+    
+    elevator dut(.clk(clk),.rst(rst),.rA(rA),.rB(rB),.rC(rC),.rD(rD),.floor(floor),.dir(dir));
+    
+    initial begin
+        clk=0;
+        forever #5 clk=~clk;
+    end 
+    
+    initial begin
+        $display("time\tclk\trst\trA\trB\trC\trD\tfloor\tdir\t");
+        $monitor("%0t\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t",$time,clk,rst,rA,rB,rC,rD,floor,dir);
+            
+            rst=1;clk=0;rA=0;rB=0;rC=0;rD=0;#10;
+            rst=0;clk=1;#20;
+            
+            rB = 1; #200; rB = 0;
+            rD = 1; #200; rD = 0;
+            rA = 1; #200; rA = 0;
+            rC = 1; #200; rC = 0;
+        $finish;
+        end 
+endmodule

@@ -1,0 +1,156 @@
+`timescale 1ns / 1ps
+//=============================================================================
+//module : elevator module 
+//purpose: to define fsm 
+//============================================================================
+
+module elevator(
+    input clk,rst,
+    input rA,rB,rC,rD,
+    output reg [1:0]floor,
+    output reg dir
+    );
+    reg [1:0]nxt_state,pr_state;
+    parameter A=2'b00,B=2'b01,C=2'b10,D=2'b11;
+    
+    always @(posedge clk) begin
+        if(rst)
+            pr_state<=A;
+        else 
+            pr_state<=nxt_state;
+   end 
+   
+   always @(*) begin
+    nxt_state=pr_state;
+    dir=dir;
+    case(pr_state)
+        A:begin
+                if(rA)begin
+                    nxt_state=A;
+                    dir=1'b1;
+                end 
+                else if(rB)begin
+                    nxt_state=B; 
+                    dir=1'b1;
+                end
+                
+                else if(rC)begin
+                    nxt_state=C;
+                    dir=1'b1;
+                end 
+                
+                else if(rD)begin
+                    nxt_state=D;
+                    dir=1'b1;
+                end 
+          
+          end 
+          
+        B:begin
+                if(rA)begin
+                    nxt_state=A;
+                    dir=1'b0;
+                end 
+                else if(rB)begin
+                    nxt_state=B; 
+                    dir=1'b1;
+                end
+                
+                else if(rC)begin
+                    nxt_state=C;
+                    dir=1'b1;
+                end 
+                
+                else if(rD)begin
+                    nxt_state=D;
+                    dir=1'b1;
+                end 
+          
+          end 
+        C:begin
+                if(rA)begin
+                    nxt_state=A;
+                    dir=1'b0;
+                end 
+                else if(rB)begin
+                    nxt_state=B; 
+                    dir=1'b0;
+                end
+                
+                else if(rC)begin
+                    nxt_state=C;
+                    dir=1'b1;
+                end 
+                
+                else if(rD)begin
+                    nxt_state=D;
+                    dir=1'b1;
+                end 
+          
+          end 
+       
+       D:begin
+                if(rA)begin
+                    nxt_state=A;
+                    dir=1'b0;
+                end 
+                else if(rB)begin
+                    nxt_state=B; 
+                    dir=1'b0;
+                end
+                
+                else if(rC)begin
+                    nxt_state=C;
+                    dir=1'b0;
+                end 
+                
+                else if(rD)begin
+                    nxt_state=D;
+                    dir=1'b1;
+                end 
+          
+          end 
+    endcase
+    end
+    
+    
+    always @(*)begin
+        case(pr_state)
+            A:floor=2'b00;
+            B:floor=2'b01;
+            C:floor=2'b10;
+            D:floor=2'b11; 
+        endcase
+    end 
+endmodule
+
+
+module tb_elevator;
+
+    reg clk;
+    reg rst;
+    reg rA,rB,rC,rD;
+    wire  [1:0]floor;
+    wire dir;
+    
+    elevator dut(.clk(clk),.rst(rst),.rA(rA),.rB(rB),.rC(rC),.rD(rD),.floor(floor),.dir(dir));
+    
+    initial begin
+        clk=0;
+        forever #5 clk=~clk;
+    end 
+    
+    initial begin
+        $display("time\tclk\trst\trA\trB\trC\trD\tfloor\tdir\t");
+        $monitor("%0t\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t",$time,clk,rst,rA,rB,rC,rD,floor,dir);
+            
+            rst=1;clk=0;rA=0;rB=0;rC=0;rD=0;#10;
+            rst=0;clk=1;#20;
+            
+            rB = 1; #200; rB = 0;
+            rD = 1; #200; rD = 0;
+            rA = 1; #200; rA = 0;
+            rC = 1; #200; rC = 0;
+        $finish;
+        end 
+endmodule
